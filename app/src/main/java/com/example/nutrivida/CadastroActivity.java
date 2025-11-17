@@ -62,7 +62,6 @@ public class CadastroActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(CadastroActivity.this, QuestionarioActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
 
@@ -77,4 +76,3 @@ public class CadastroActivity extends AppCompatActivity {
         });
     }
 }
-

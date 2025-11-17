@@ -27,45 +27,50 @@ public class QuestionarioActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_questionario);
+        try {
+            setContentView(R.layout.activity_questionario);
 
 
-        pesoEditText = findViewById(R.id.et_peso);
-        alturaEditText = findViewById(R.id.et_altura);
-        idadeEditText = findViewById(R.id.et_idade);
-        sexoSpinner = findViewById(R.id.sp_sexo);
-        objetivoSpinner = findViewById(R.id.sp_objetivo);
-        atividadeSpinner = findViewById(R.id.sp_atividade);
-        proximoButton = findViewById(R.id.btn_proximo);
+            pesoEditText = findViewById(R.id.et_peso);
+            alturaEditText = findViewById(R.id.et_altura);
+            idadeEditText = findViewById(R.id.et_idade);
+            sexoSpinner = findViewById(R.id.sp_sexo);
+            objetivoSpinner = findViewById(R.id.sp_objetivo);
+            atividadeSpinner = findViewById(R.id.sp_atividade);
+            proximoButton = findViewById(R.id.btn_proximo);
 
 
-        ArrayAdapter<CharSequence> sexoAdapter = ArrayAdapter.createFromResource(this,
-                R.array.opcoes_sexo, android.R.layout.simple_spinner_item);
-        sexoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sexoSpinner.setAdapter(sexoAdapter);
+            ArrayAdapter<CharSequence> sexoAdapter = ArrayAdapter.createFromResource(this,
+                    R.array.opcoes_sexo, android.R.layout.simple_spinner_item);
+            sexoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            sexoSpinner.setAdapter(sexoAdapter);
 
 
-        ArrayAdapter<CharSequence> objetivoAdapter = ArrayAdapter.createFromResource(this,
-                R.array.opcoes_objetivo, android.R.layout.simple_spinner_item);
-        objetivoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        objetivoSpinner.setAdapter(objetivoAdapter);
+            ArrayAdapter<CharSequence> objetivoAdapter = ArrayAdapter.createFromResource(this,
+                    R.array.opcoes_objetivo, android.R.layout.simple_spinner_item);
+            objetivoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            objetivoSpinner.setAdapter(objetivoAdapter);
 
 
-        ArrayAdapter<CharSequence> atividadeAdapter = ArrayAdapter.createFromResource(this,
-                R.array.opcoes_atividade, android.R.layout.simple_spinner_item);
-        atividadeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        atividadeSpinner.setAdapter(atividadeAdapter);
+            ArrayAdapter<CharSequence> atividadeAdapter = ArrayAdapter.createFromResource(this,
+                    R.array.opcoes_atividade, android.R.layout.simple_spinner_item);
+            atividadeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            atividadeSpinner.setAdapter(atividadeAdapter);
 
 
-        proximoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (validarCampos()) {
+            proximoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (validarCampos()) {
 //                    Intent intent = new Intent(QuestionarioActivity.this, AlergiasActivity.class);
 //                    startActivity(intent);
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao iniciar QuestionarioActivity: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 
 
