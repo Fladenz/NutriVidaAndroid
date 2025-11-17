@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DBF8C9"
+    tools:context=".DashboardActivity">
+
+
+    <ImageView
+        android:id="@+id/background_fruits_top_left"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/frutas_canto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/background_fruits_top_right"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/frutas_canto"
+        android:rotation="90"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/background_fruits_bottom_left"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/frutas_canto"
+        android:rotation="270"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/background_fruits_bottom_right"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/frutas_canto"
+        android:rotation="180"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/tv_welcome_dashboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Olá, [Nome do Usuário]!"
+            android:textColor="@android:color/black"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+
+        <TextView
+            android:id="@+id/tv_motivational_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estamos felizes em ajudar você a alcançar seus objetivos!"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp" />
+
+
+        <Button
+            android:id="@+id/btn_plano_alimentar"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#81C784"
+            android:text="Meu Plano Alimentar"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+
+        <Button
+            android:id="@+id/btn_receitas"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#81C784"
+            android:text="Receitas Saudáveis"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+
+        <Button
+            android:id="@+id/btn_monitoramento"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#81C784"
+            android:text="Monitoramento e Progresso"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+
+        <Button
+            android:id="@+id/btn_configuracoes"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#81C784"
+            android:text="Configurações"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Adicionando botões faltantes para Refeições do Dia e Hidratação -->
+        <Button
+            android:id="@+id/btn_refeicoes_dia"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#4DB6AC"
+            android:text="Refeições do Dia"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btn_hidratacao"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#4DB6AC"
+            android:text="Hidratação"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

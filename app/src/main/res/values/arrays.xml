@@ -1,0 +1,18 @@
+<resources>
+    <string-array name="opcoes_sexo">
+        <item>Masculino</item>
+        <item>Feminino</item>
+        <item>Outro</item>
+    </string-array>
+    <string-array name="opcoes_objetivo">
+        <item>Perder peso</item>
+        <item>Manter peso</item>
+        <item>Ganhar peso</item>
+    </string-array>
+    <string-array name="opcoes_atividade">
+        <item>Sedentário</item>
+        <item>Levemente ativo</item>
+        <item>Ativo</item>
+        <item>Muito ativo</item>
+    </string-array>
+</resources>
