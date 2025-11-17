@@ -4,6 +4,7 @@ package com.example.nutrivida;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,6 +15,8 @@ import android.widget.Toast;
 
 public class QuestionarioActivity extends AppCompatActivity {
 
+    private static final String TAG = "QuestionarioActivity";
+    private static final boolean DEBUG_SKIP_VALIDATION = true; // DEBUG: pular validação temporariamente para testar navegação
 
     private EditText pesoEditText;
     private EditText alturaEditText;
@@ -61,15 +64,36 @@ public class QuestionarioActivity extends AppCompatActivity {
             proximoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (validarCampos()) {
-//                    Intent intent = new Intent(QuestionarioActivity.this, AlergiasActivity.class);
-//                    startActivity(intent);
+                    Log.d(TAG, "btn_proximo clicked");
+                    // Debug: log current values so we can see why validarCampos may fail
+                    String peso = pesoEditText.getText().toString();
+                    String altura = alturaEditText.getText().toString();
+                    String idade = idadeEditText.getText().toString();
+                    int sexoPos = sexoSpinner.getSelectedItemPosition();
+                    int objPos = objetivoSpinner.getSelectedItemPosition();
+                    int attPos = atividadeSpinner.getSelectedItemPosition();
+                    Log.d(TAG, "values -> peso:" + peso + " altura:" + altura + " idade:" + idade +
+                            " sexoPos:" + sexoPos + " objPos:" + objPos + " attPos:" + attPos);
+
+                    if (!DEBUG_SKIP_VALIDATION && !validarCampos()) {
+                        // show reason via Toast is already done in validarCampos; keep extra log
+                        Toast.makeText(QuestionarioActivity.this, "Validação falhou — verifique os campos.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    try {
+                        Intent intent = new Intent(QuestionarioActivity.this, AlergiasActivity.class);
+                        startActivity(intent);
+                        Log.d(TAG, "Started AlergiasActivity");
+                    } catch (Exception e) {
+                        Log.e(TAG, "Erro ao iniciar AlergiasActivity", e);
+                        Toast.makeText(QuestionarioActivity.this, "Erro ao abrir Alergias: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             });
         } catch (Exception e) {
             Toast.makeText(this, "Erro ao iniciar QuestionarioActivity: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+            Log.e(TAG, "onCreate error", e);
         }
     }
 

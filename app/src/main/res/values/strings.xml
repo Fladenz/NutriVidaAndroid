@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">nutrivida</string>
     <string name="logo_desc">Logo NutriVida</string>
@@ -8,28 +8,36 @@
     <string name="title_login">Login</string>
     <string name="title_cadastro">Cadastro</string>
 
-<string-array name="opcoes_sexo">
-    <item>Sexo</item>
-    <item>Masculino</item>
-    <item>Feminino</item>
-</string-array>
+    <string name="concluir">Concluir</string>
+    <string name="voltar">Voltar</string>
+
+    <string name="alergias_title">Quais alergias/intolerâncias alimentares você possui?</string>
+    <string name="alergias_subtitle">Liste seus alimentos de restrição (separados por vírgula ou em linhas diferentes) para personalizar seu plano de forma segura.</string>
+    <string name="alergias_hint">Ex: Leite, Camarão, Amendoim, Glúten...</string>
+    <string name="sem_alergias">Não tenho alergias (Prosseguir)</string>
+
+    <string-array name="opcoes_sexo">
+        <item>Sexo</item>
+        <item>Masculino</item>
+        <item>Feminino</item>
+    </string-array>
 
 
-<string-array name="opcoes_objetivo">
-    <item>Objetivo</item>
-    <item>Ganho de massa muscular</item>
-    <item>Perda de gordura</item>
-    <item>Manutenção</item>
-</string-array>
+    <string-array name="opcoes_objetivo">
+        <item>Objetivo</item>
+        <item>Ganho de massa muscular</item>
+        <item>Perda de gordura</item>
+        <item>Manutenção</item>
+    </string-array>
 
 
-<string-array name="opcoes_atividade">
-    <item>Nível de atividade física</item>
-    <item>Sedentário</item>
-    <item>Leve (1-3 dias)</item>
-    <item>Moderado (3-5 dias)</item>
-    <item>Ativo (6-7 dias)</item>
-</string-array>
+    <string-array name="opcoes_atividade">
+        <item>Nível de atividade física</item>
+        <item>Sedentário</item>
+        <item>Leve (1-3 dias)</item>
+        <item>Moderado (3-5 dias)</item>
+        <item>Ativo (6-7 dias)</item>
+    </string-array>
 
 
 </resources>
