@@ -43,8 +43,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Por favor, preencha todos os campos.", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(LoginActivity.this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent(LoginActivity.this, QuestionarioActivity.class);
-//                    startActivity(intent);
+                   Intent intent = new Intent(LoginActivity.this, QuestionarioActivity.class);
+                    startActivity(intent);
                     finish();
                 }
             }

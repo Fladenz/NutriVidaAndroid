@@ -60,8 +60,8 @@ public class CadastroActivity extends AppCompatActivity {
                 Toast.makeText(CadastroActivity.this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
 
 
-//                Intent intent = new Intent(CadastroActivity.this, QuestionarioActivity.class);
-//                startActivity(intent);
+                Intent intent = new Intent(CadastroActivity.this, QuestionarioActivity.class);
+                startActivity(intent);
                 finish();
             }
         });
