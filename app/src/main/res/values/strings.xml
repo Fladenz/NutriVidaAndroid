@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">nutrivida</string>
+    <string name="logo_desc">Logo NutriVida</string>
+    <string name="welcome_message">Bem-vindo ao NutriVida! Vamos juntos cuidar da sua saúde com refeições gostosas e personalizadas.</string>
+    <string name="entrar">Entrar</string>
+    <string name="cadastrar_se">Cadastrar-se</string>
+    <string name="title_login">Login</string>
+    <string name="title_cadastro">Cadastro</string>
 </resources>
