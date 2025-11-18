@@ -14,27 +14,29 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
+        android:paddingTop="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
+        <!-- Logo ImageView placed above the welcome text (increased size) -->
         <ImageView
-            android:id="@+id/logo_img"
-            android:layout_width="200dp"
-            android:layout_height="120dp"
+            android:id="@+id/img_logo"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:src="@drawable/nutri"
             android:contentDescription="@string/logo_desc"
-            android:src="@drawable/logo_nutrivida" />
-
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/tv_welcome_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/welcome_message"
-            android:textAlignment="center"
+            android:layout_marginTop="8dp"
+            android:text="Bem vindo"
             android:textSize="18sp"
             android:textColor="@android:color/black" />
 
@@ -44,7 +46,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/entrar"
+            android:text="Entrar"
             android:textColor="@android:color/white"
             android:backgroundTint="#5CBF78" />
 
@@ -54,7 +56,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/cadastrar_se"
+            android:text="Cadastrar-se"
             android:textColor="@android:color/white"
             android:backgroundTint="#5CBF78" />
 

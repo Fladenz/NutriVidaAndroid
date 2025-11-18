@@ -61,13 +61,5 @@
             android:textColor="@android:color/white"
             android:layout_marginBottom="16dp" />
 
-
-        <TextView
-            android:id="@+id/tv_forgot_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Esqueci minha senha"
-            android:textColor="#59A05E"
-            android:textStyle="bold" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
