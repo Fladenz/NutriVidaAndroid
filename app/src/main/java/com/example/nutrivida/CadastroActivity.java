@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.concurrent.Executors;
+import com.example.nutrivida.data.User;
+import com.example.nutrivida.data.DatabaseClient;
 
 
 public class CadastroActivity extends AppCompatActivity {
@@ -55,13 +58,40 @@ public class CadastroActivity extends AppCompatActivity {
                     Toast.makeText(CadastroActivity.this, "As senhas não coincidem.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                // persist user using Room on background thread
+                Executors.newSingleThreadExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            DatabaseClient dbClient = DatabaseClient.getInstance(CadastroActivity.this);
+                            com.example.nutrivida.data.UserDao userDao = dbClient.getAppDatabase().userDao();
 
+                            // check if email already exists
+                            User existing = userDao.findByEmail(email);
+                            if (existing != null) {
+                                runOnUiThread(() -> Toast.makeText(CadastroActivity.this, "Email já cadastrado.", Toast.LENGTH_SHORT).show());
+                                return;
+                            }
 
-                Toast.makeText(CadastroActivity.this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                            User newUser = new User(fullName, email, password);
+                            long id = userDao.insert(newUser);
 
-
-                Intent intent = new Intent(CadastroActivity.this, QuestionarioActivity.class);
-                startActivity(intent);
+                            runOnUiThread(() -> {
+                                if (id > 0) {
+                                    Toast.makeText(CadastroActivity.this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(CadastroActivity.this, QuestionarioActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(CadastroActivity.this, "Falha ao cadastrar usuário.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            runOnUiThread(() -> Toast.makeText(CadastroActivity.this, "Erro ao salvar usuário: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        }
+                    }
+                });
             }
         });
 

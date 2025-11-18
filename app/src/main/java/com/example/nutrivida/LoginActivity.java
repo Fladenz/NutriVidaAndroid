@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.concurrent.Executors;
+import com.example.nutrivida.data.DatabaseClient;
+import com.example.nutrivida.data.User;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -42,10 +45,36 @@ public class LoginActivity extends AppCompatActivity {
                 if (email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Por favor, preencha todos os campos.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
-                   Intent intent = new Intent(LoginActivity.this, QuestionarioActivity.class);
-                    startActivity(intent);
-                    finish();
+                    // validate against local DB on background thread
+                    Executors.newSingleThreadExecutor().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                DatabaseClient dbClient = DatabaseClient.getInstance(LoginActivity.this);
+                                com.example.nutrivida.data.UserDao userDao = dbClient.getAppDatabase().userDao();
+                                User user = userDao.findByEmail(email);
+                                if (user == null) {
+                                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Usuário não encontrado.", Toast.LENGTH_SHORT).show());
+                                    return;
+                                }
+
+                                if (!user.password.equals(password)) {
+                                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Senha incorreta.", Toast.LENGTH_SHORT).show());
+                                    return;
+                                }
+
+                                runOnUiThread(() -> {
+                                    Toast.makeText(LoginActivity.this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(LoginActivity.this, QuestionarioActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Erro ao autenticar: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                            }
+                        }
+                    });
                 }
             }
         });
