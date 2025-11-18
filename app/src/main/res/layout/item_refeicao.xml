@@ -21,5 +21,13 @@
         android:layout_marginTop="4dp"
         android:textColor="#444444" />
 
-</LinearLayout>
+    <!-- New: gramatura/portion size -->
+    <TextView
+        android:id="@+id/tv_gramatura_refeicao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginTop="4dp"
+        android:textColor="#666666" />
 
+</LinearLayout>

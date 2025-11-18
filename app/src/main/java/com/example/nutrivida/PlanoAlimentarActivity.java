@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -124,10 +123,11 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
 
     private List<Refeicao> getPlanoAlimentarSimulado() {
         List<Refeicao> refeicoes = new ArrayList<>();
-        refeicoes.add(new Refeicao("Café da Manhã", "Ovos mexidos, aveia e suco de laranja.", 430));
-        refeicoes.add(new Refeicao("Almoço", "Frango grelhado, arroz integral e salada.", 625));
-        refeicoes.add(new Refeicao("Lanche da Tarde", "Iogurte natural e mel.", 214));
-        refeicoes.add(new Refeicao("Jantar", "Peixe grelhado e batata doce.", 460));
+        // nome, descricao, calorias, gramatura (porção sugerida)
+        refeicoes.add(new Refeicao("Café da Manhã", "Ovos mexidos, aveia e suco de laranja.", 430, "2 ovos (100g), 40g aveia, 200ml suco"));
+        refeicoes.add(new Refeicao("Almoço", "Frango grelhado, arroz integral e salada.", 625, "120g frango, 150g arroz, 80g salada"));
+        refeicoes.add(new Refeicao("Lanche da Tarde", "Iogurte natural e mel.", 214, "170g iogurte, 10g mel"));
+        refeicoes.add(new Refeicao("Jantar", "Peixe grelhado e batata doce.", 460, "150g peixe, 150g batata doce"));
         return refeicoes;
     }
 
@@ -136,12 +136,14 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         private final String nome;
         private final String descricao;
         private final int calorias;
+        private final String gramatura;
 
 
-        public Refeicao(String nome, String descricao, int calorias) {
+        public Refeicao(String nome, String descricao, int calorias, String gramatura) {
             this.nome = nome;
             this.descricao = descricao;
             this.calorias = calorias;
+            this.gramatura = gramatura;
         }
 
 
@@ -158,6 +160,8 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         public int getCalorias() {
             return calorias;
         }
+
+        public String getGramatura() { return gramatura; }
     }
 
 
@@ -183,6 +187,7 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
             Refeicao refeicao = listaRefeicoes.get(position);
             holder.nomeRefeicao.setText(refeicao.getNome());
             holder.descricaoRefeicao.setText(refeicao.getDescricao() + " - " + refeicao.getCalorias() + " kcal");
+            holder.gramaturaRefeicao.setText("Porção: " + refeicao.getGramatura());
         }
 
 
@@ -195,12 +200,14 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         public static class RefeicaoViewHolder extends RecyclerView.ViewHolder {
             public final TextView nomeRefeicao;
             public final TextView descricaoRefeicao;
+            public final TextView gramaturaRefeicao;
 
 
             public RefeicaoViewHolder(View itemView) {
                 super(itemView);
                 nomeRefeicao = itemView.findViewById(R.id.tv_nome_refeicao);
                 descricaoRefeicao = itemView.findViewById(R.id.tv_descricao_refeicao);
+                gramaturaRefeicao = itemView.findViewById(R.id.tv_gramatura_refeicao);
             }
         }
     }
