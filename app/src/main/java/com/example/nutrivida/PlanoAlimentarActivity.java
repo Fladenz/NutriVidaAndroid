@@ -100,7 +100,7 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         normalizedRaw = normalizedRaw.replaceAll("\\s+ou\\s+", ",");
 
         String[] parts;
-        // If user used explicit separators, split on them; otherwise, split on whitespace so "ovo leite" also works
+        // If user used explicit separators, split on them; otherwise, split on whitespace so "ovo leite" também funciona
         if (normalizedRaw.contains(",") || normalizedRaw.contains(";") || normalizedRaw.contains("/") || normalizedRaw.contains("\n")) {
             parts = normalizedRaw.split("[,;\\n/]+");
         } else {
@@ -126,7 +126,20 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
     private List<Refeicao> filterPlanoByAlergias(List<Refeicao> plano, List<String> alergias) {
         if (alergias == null || alergias.isEmpty()) return plano;
 
-        // substitutions map: allergen(normalized) -> suggested substitute (text)
+        // Canonical allergen -> list of keywords to search in meal text
+        Map<String, List<String>> allergenKeywords = new HashMap<>();
+        allergenKeywords.put("ovo", List.of("ovo","ovos","gema","clara"));
+        allergenKeywords.put("leite", List.of("leite","leite de vaca","iogurte","queijo","creme","manteiga","leite condensado"));
+        allergenKeywords.put("frango", List.of("frango","peito de frango"));
+        allergenKeywords.put("peixe", List.of("peixe","salmão"));
+        allergenKeywords.put("mel", List.of("mel"));
+        allergenKeywords.put("aveia", List.of("aveia"));
+        allergenKeywords.put("amendoim", List.of("amendoim","amendoins"));
+        allergenKeywords.put("castanha", List.of("castanha","castanhas","amendoa","amendoas","noz","nozes"));
+        allergenKeywords.put("trigo", List.of("trigo","gluten","farinha","pao"));
+        allergenKeywords.put("queijo", List.of("queijo","queijos"));
+
+        // substitutions map: keyword or canonical allergen -> suggested substitute (text)
         Map<String, String> substitutions = new HashMap<>();
         substitutions.put("ovo", "tofu");
         substitutions.put("ovos", "tofu");
@@ -156,57 +169,151 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         substitutions.put("trigo", "quinoa/cozinha sem glúten");
         substitutions.put("gluten", "opções sem glúten");
 
+        // grams for substitutes (key uses normalized keyword)
+        Map<String, String> substitutionGrams = new HashMap<>();
+        substitutionGrams.put("ovo", "100g");
+        substitutionGrams.put("ovos", "100g");
+        substitutionGrams.put("gema", "100g");
+        substitutionGrams.put("clara", "100g");
+        substitutionGrams.put("leite", "200ml");
+        substitutionGrams.put("leite de vaca", "200ml");
+        substitutionGrams.put("iogurte", "170g");
+        substitutionGrams.put("iogurte natural", "170g");
+        substitutionGrams.put("frango", "120g");
+        substitutionGrams.put("peito de frango", "120g");
+        substitutionGrams.put("peixe", "150g");
+        substitutionGrams.put("salmão", "150g");
+        substitutionGrams.put("mel", "10g");
+        substitutionGrams.put("aveia", "40g");
+        substitutionGrams.put("amendoim", "30g");
+        substitutionGrams.put("castanha", "30g");
+        substitutionGrams.put("queijo", "30g");
+        substitutionGrams.put("trigo", "100g");
+        substitutionGrams.put("gluten", "100g");
+
+        // Map user tokens to canonical allergen keys for robust matching
+        java.util.Set<String> canonicalSelected = new java.util.HashSet<>();
+        for (String token : alergias) {
+            if (token == null || token.isEmpty()) continue;
+            boolean mapped = false;
+            for (Map.Entry<String, List<String>> e : allergenKeywords.entrySet()) {
+                for (String kw : e.getValue()) {
+                    if (kw.equals(token) || kw.contains(token) || token.contains(kw)) {
+                        canonicalSelected.add(e.getKey());
+                        mapped = true;
+                        break;
+                    }
+                }
+                if (mapped) break;
+            }
+            if (!mapped) {
+                canonicalSelected.add(token);
+            }
+        }
+
+        Log.d(TAG, "canonicalSelected=" + canonicalSelected);
+
         List<Refeicao> out = new ArrayList<>();
 
         for (Refeicao r : plano) {
-            String nomeN = normalize(r.getNome());
-            String descN = normalize(r.getDescricao());
+            String nomeOriginal = r.getNome();
+            String descOriginal = r.getDescricao();
+            String nomeN = normalize(nomeOriginal);
+            String descN = normalize(descOriginal);
+            // normalized combined text for substring checks
+            String combined = (nomeN + " " + descN).replaceAll("[^a-z0-9\\s]", " ").trim();
+            String[] words = combined.split("\\s+");
+            java.util.Set<String> mealWords = new java.util.HashSet<>();
+            for (String w : words) if (!w.isEmpty()) mealWords.add(w);
+
+            Log.d(TAG, "Refeição='" + nomeOriginal + "' words=" + mealWords);
 
             boolean containsAllergen = false;
             boolean canSubstituteAll = true;
             StringBuilder subsNote = new StringBuilder();
+            // track substitutions found for this meal (use original keyword strings)
+            Map<String,String> substitutionsPerformed = new HashMap<>();
 
-            for (String a : alergias) {
-                if (a.isEmpty()) continue;
-                // if allergy token appears inside meal name or description
-                if (nomeN.contains(a) || descN.contains(a)) {
-                    containsAllergen = true;
-                    String sub = null;
-                    // try direct match
-                    if (substitutions.containsKey(a)) sub = substitutions.get(a);
-                    else {
-                        // try to find key that contains the allergen token (e.g., 'leite' in 'leite de vaca')
-                        for (Map.Entry<String, String> e : substitutions.entrySet()) {
-                            if (e.getKey().contains(a) || a.contains(e.getKey())) {
-                                sub = e.getValue();
-                                break;
-                            }
+            for (String canon : canonicalSelected) {
+                List<String> keywords = allergenKeywords.getOrDefault(canon, List.of(canon));
+
+                boolean thisCanonFoundInMeal = false;
+                String chosenSubForCanon = null;
+
+                for (String kw : keywords) {
+                    String kwNorm = normalize(kw);
+                    // check substring match first
+                    boolean matches = false;
+                    if (!kwNorm.isEmpty() && combined.contains(kwNorm)) matches = true;
+
+                    // if not substring match, check whole-word presence (all parts)
+                    if (!matches) {
+                        String[] kwParts = kwNorm.replaceAll("[^a-z0-9\\s]", " ").split("\\s+");
+                        boolean allPresent = true;
+                        for (String part : kwParts) {
+                            if (part.isEmpty()) continue;
+                            if (!mealWords.contains(part)) { allPresent = false; break; }
                         }
+                        if (allPresent) matches = true;
                     }
 
-                    if (sub != null) {
-                        subsNote.append(a).append(" -> ").append(sub).append("; ");
-                    } else {
-                        // no substitute available for this allergen in this meal
-                        canSubstituteAll = false;
+                    if (matches) {
+                        thisCanonFoundInMeal = true;
+                        // find a substitute: try exact keyword, then canonical key
+                        if (substitutions.containsKey(kwNorm)) chosenSubForCanon = substitutions.get(kwNorm);
+                        else if (substitutions.containsKey(canon)) chosenSubForCanon = substitutions.get(canon);
+                        else {
+                            for (Map.Entry<String,String> e : substitutions.entrySet()) {
+                                String key = e.getKey();
+                                if (key.contains(kwNorm) || kwNorm.contains(key) || key.contains(canon) || canon.contains(key)) {
+                                    chosenSubForCanon = e.getValue();
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (chosenSubForCanon != null) {
+                            subsNote.append(kw).append(" -> ").append(chosenSubForCanon).append("; ");
+                            substitutionsPerformed.put(kw, chosenSubForCanon);
+                        } else {
+                            canSubstituteAll = false;
+                        }
+
                         break;
                     }
                 }
+
+                if (thisCanonFoundInMeal) containsAllergen = true;
             }
 
+            Log.d(TAG, "Refeição='" + nomeOriginal + "' containsAllergen=" + containsAllergen + " canSubstituteAll=" + canSubstituteAll + " subsNote=" + subsNote.toString());
+
             if (!containsAllergen) {
-                // meal safe — keep original
                 out.add(r);
             } else {
                 if (canSubstituteAll) {
-                    // produce an adapted meal: append substitutions notes to description
-                    String novoNome = r.getNome() + " (adaptado)";
-                    String novaDesc = r.getDescricao() + " (Substituições: " + subsNote.toString().trim() + ")";
-                    // create adapted gramatura note — keep same gramatura for now
-                    out.add(new Refeicao(novoNome, novaDesc, r.getCalorias(), r.getGramatura()));
+                    String novoNome = nomeOriginal + " (adaptado)";
+                    String novaDesc = descOriginal;
+                    String novaGramatura = r.getGramatura();
+                    // apply replacements on original name and description using the original keyword strings (case-insensitive)
+                    for (Map.Entry<String,String> rep : substitutionsPerformed.entrySet()) {
+                        String kw = rep.getKey();
+                        String sub = rep.getValue();
+                        // include gramatura for the substitute when available
+                        String gram = substitutionGrams.getOrDefault(normalize(kw), "");
+                        String replacementText = sub + (gram.isEmpty() ? "" : " (" + gram + ")");
+                        // use case-insensitive word-boundary replacement
+                        novaDesc = novaDesc.replaceAll("(?i)\\b" + java.util.regex.Pattern.quote(kw) + "\\b", replacementText);
+                        novoNome = novoNome.replaceAll("(?i)\\b" + java.util.regex.Pattern.quote(kw) + "\\b", replacementText);
+                        novaGramatura = novaGramatura.replaceAll("(?i)\\b" + java.util.regex.Pattern.quote(kw) + "\\b", replacementText);
+                    }
+                    // if no replacement touched the description (as fallback), append note
+                    if (novaDesc.equals(descOriginal)) {
+                        novaDesc = descOriginal + " (Substituições: " + subsNote.toString().trim() + ")";
+                    }
+                    out.add(new Refeicao(novoNome, novaDesc, r.getCalorias(), novaGramatura));
                 } else {
-                    // unable to substitute, skip this meal
-                    Log.d(TAG, "Removendo refeição '" + r.getNome() + "' por conter alergênicos sem substituto.");
+                    Log.d(TAG, "Removendo refeição '" + nomeOriginal + "' por conter alergênicos sem substituto.");
                 }
             }
         }
