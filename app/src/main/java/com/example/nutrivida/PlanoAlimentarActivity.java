@@ -19,6 +19,8 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
 
 
 public class PlanoAlimentarActivity extends AppCompatActivity {
@@ -92,12 +94,25 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
 
     private List<String> parseAlergias(String raw) {
         if (raw == null || raw.trim().isEmpty()) return new ArrayList<>();
-        // split por vírgula, ponto-e-vírgula ou espaço, e normalize
-        String[] parts = raw.split("[;,\\n]+|\\s+");
+        // Normalize input and replace Portuguese connectors with commas
+        String normalizedRaw = raw.trim().toLowerCase(Locale.ROOT);
+        normalizedRaw = normalizedRaw.replaceAll("\\s+e\\s+", ",");
+        normalizedRaw = normalizedRaw.replaceAll("\\s+ou\\s+", ",");
+
+        String[] parts;
+        // If user used explicit separators, split on them; otherwise, split on whitespace so "ovo leite" also works
+        if (normalizedRaw.contains(",") || normalizedRaw.contains(";") || normalizedRaw.contains("/") || normalizedRaw.contains("\n")) {
+            parts = normalizedRaw.split("[,;\\n/]+");
+        } else {
+            parts = normalizedRaw.split("\\s+");
+        }
+
         List<String> out = new ArrayList<>();
         for (String p : parts) {
-            String n = normalize(p);
-            if (!n.isEmpty()) out.add(n);
+            String t = p.trim();
+            if (t.isEmpty()) continue;
+            String n = normalize(t);
+            if (!n.isEmpty() && !n.equals("e") && !n.equals("ou")) out.add(n);
         }
         return out;
     }
@@ -110,20 +125,92 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
 
     private List<Refeicao> filterPlanoByAlergias(List<Refeicao> plano, List<String> alergias) {
         if (alergias == null || alergias.isEmpty()) return plano;
+
+        // substitutions map: allergen(normalized) -> suggested substitute (text)
+        Map<String, String> substitutions = new HashMap<>();
+        substitutions.put("ovo", "tofu");
+        substitutions.put("ovos", "tofu");
+        substitutions.put("gema", "tofu");
+        substitutions.put("clara", "tofu");
+        substitutions.put("leite", "bebida vegetal");
+        substitutions.put("leite de vaca", "bebida vegetal");
+        substitutions.put("iogurte", "iogurte vegetal");
+        substitutions.put("iogurte natural", "iogurte vegetal");
+        substitutions.put("frango", "proteína vegetal grelhada (tofu/tempeh)");
+        substitutions.put("peito de frango", "proteína vegetal grelhada (tofu/tempeh)");
+        substitutions.put("peixe", "proteína vegetal (tofu)");
+        substitutions.put("salmão", "proteína vegetal (tofu)");
+        substitutions.put("mel", "geleia de frutas");
+        substitutions.put("aveia", "flocos de quinoa");
+        substitutions.put("amendoim", "sementes de girassol");
+        substitutions.put("amendoins", "sementes de girassol");
+        substitutions.put("amendoa", "sementes de girassol");
+        substitutions.put("amendoas", "sementes de girassol");
+        substitutions.put("castanha", "sementes mistas");
+        substitutions.put("castanhas", "sementes mistas");
+        substitutions.put("noz", "sementes mistas");
+        substitutions.put("queijo", "queijo vegetal");
+        substitutions.put("creme de leite", "creme vegetal");
+        substitutions.put("manteiga", "margarina vegetal");
+        substitutions.put("leite condensado", "doce vegetal");
+        substitutions.put("trigo", "quinoa/cozinha sem glúten");
+        substitutions.put("gluten", "opções sem glúten");
+
         List<Refeicao> out = new ArrayList<>();
+
         for (Refeicao r : plano) {
-            String nome = normalize(r.getNome());
-            String desc = normalize(r.getDescricao());
-            boolean containsAlergia = false;
+            String nomeN = normalize(r.getNome());
+            String descN = normalize(r.getDescricao());
+
+            boolean containsAllergen = false;
+            boolean canSubstituteAll = true;
+            StringBuilder subsNote = new StringBuilder();
+
             for (String a : alergias) {
                 if (a.isEmpty()) continue;
-                if (nome.contains(a) || desc.contains(a)) {
-                    containsAlergia = true;
-                    break;
+                // if allergy token appears inside meal name or description
+                if (nomeN.contains(a) || descN.contains(a)) {
+                    containsAllergen = true;
+                    String sub = null;
+                    // try direct match
+                    if (substitutions.containsKey(a)) sub = substitutions.get(a);
+                    else {
+                        // try to find key that contains the allergen token (e.g., 'leite' in 'leite de vaca')
+                        for (Map.Entry<String, String> e : substitutions.entrySet()) {
+                            if (e.getKey().contains(a) || a.contains(e.getKey())) {
+                                sub = e.getValue();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (sub != null) {
+                        subsNote.append(a).append(" -> ").append(sub).append("; ");
+                    } else {
+                        // no substitute available for this allergen in this meal
+                        canSubstituteAll = false;
+                        break;
+                    }
                 }
             }
-            if (!containsAlergia) out.add(r);
+
+            if (!containsAllergen) {
+                // meal safe — keep original
+                out.add(r);
+            } else {
+                if (canSubstituteAll) {
+                    // produce an adapted meal: append substitutions notes to description
+                    String novoNome = r.getNome() + " (adaptado)";
+                    String novaDesc = r.getDescricao() + " (Substituições: " + subsNote.toString().trim() + ")";
+                    // create adapted gramatura note — keep same gramatura for now
+                    out.add(new Refeicao(novoNome, novaDesc, r.getCalorias(), r.getGramatura()));
+                } else {
+                    // unable to substitute, skip this meal
+                    Log.d(TAG, "Removendo refeição '" + r.getNome() + "' por conter alergênicos sem substituto.");
+                }
+            }
         }
+
         return out;
     }
 
