@@ -1,18 +1,20 @@
 <resources>
     <string-array name="opcoes_sexo">
+        <item>Sexo</item>
         <item>Masculino</item>
         <item>Feminino</item>
-        <item>Outro</item>
     </string-array>
     <string-array name="opcoes_objetivo">
-        <item>Perder peso</item>
+        <item>Objetivo</item>
+        <item>Perder gordura</item>
         <item>Manter peso</item>
-        <item>Ganhar peso</item>
+        <item>Ganhar massa muscular</item>
     </string-array>
     <string-array name="opcoes_atividade">
-        <item>Sedentário</item>
-        <item>Levemente ativo</item>
-        <item>Ativo</item>
-        <item>Muito ativo</item>
+        <item>Nível de atividade física</item>
+        <item>trabalho sedentario(trabalho de escritorio)</item>
+        <item>exercicio leve( 1 a 2 dias)</item>
+        <item>exercicio moderado(3 a 5 dias)</item>
+        <item>exercicio intenso( 6 a 7 dias por semana)</item>
     </string-array>
 </resources>
