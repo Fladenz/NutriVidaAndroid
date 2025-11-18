@@ -79,6 +79,9 @@ public class AlergiasActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(this, PlanoAlimentarActivity.class);
             intent.putExtra("alergias", alergias != null ? alergias : "");
+            // forward calorias_diarias if present
+            int calorias = getIntent() != null ? getIntent().getIntExtra("calorias_diarias", -1) : -1;
+            if (calorias > 0) intent.putExtra("calorias_diarias", calorias);
             startActivity(intent);
         } catch (Exception e) {
             Log.e(TAG, "Erro ao iniciar PlanoAlimentarActivity", e);

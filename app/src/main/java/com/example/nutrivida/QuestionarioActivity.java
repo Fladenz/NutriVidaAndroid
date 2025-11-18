@@ -81,8 +81,12 @@ public class QuestionarioActivity extends AppCompatActivity {
                         return;
                     }
 
+                    int caloriasDiarias = calcularCaloriasDiarias(peso, altura, idade, sexoPos, objPos, attPos);
+                    Log.d(TAG, "Calorias diarias calculadas: " + caloriasDiarias);
+
                     try {
                         Intent intent = new Intent(QuestionarioActivity.this, AlergiasActivity.class);
+                        intent.putExtra("calorias_diarias", caloriasDiarias);
                         startActivity(intent);
                         Log.d(TAG, "Started AlergiasActivity");
                     } catch (Exception e) {
@@ -114,5 +118,53 @@ public class QuestionarioActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Calcula calorias diárias usando Mifflin-St Jeor e ajuste por nível de atividade e objetivo.
+     * parâmetros: sexoPos/objPos/attPos seguem os índices do array (0 = placeholder).
+     */
+    private int calcularCaloriasDiarias(String pesoStr, String alturaStr, String idadeStr, int sexoPos, int objPos, int attPos) {
+        try {
+            double peso = pesoStr.isEmpty() ? 70.0 : Double.parseDouble(pesoStr); // kg
+            double altura = alturaStr.isEmpty() ? 170.0 : Double.parseDouble(alturaStr); // cm
+            int idade = idadeStr.isEmpty() ? 30 : Integer.parseInt(idadeStr);
+
+            // Mifflin-St Jeor
+            double s = 5; // default male
+            if (sexoPos == 2) s = -161; // female
+            else if (sexoPos == 1) s = 5;
+            else if (sexoPos > 2) s = 0; // 'Outro' fallback
+
+            double bmr = 10.0 * peso + 6.25 * altura - 5.0 * idade + s;
+
+            // activity factor mapping (arrays.xml has placeholder at index 0)
+            double activityFactor = 1.2; // sedentary
+            switch (attPos) {
+                case 1: activityFactor = 1.2; break; // trabalho sedentario
+                case 2: activityFactor = 1.375; break; // leve
+                case 3: activityFactor = 1.55; break; // moderado
+                case 4: activityFactor = 1.725; break; // intenso
+                default: activityFactor = 1.2; break;
+            }
+
+            double tdee = bmr * activityFactor;
+
+            // objetivo adjustment
+            int ajuste = 0;
+            switch (objPos) {
+                case 1: ajuste = -500; break; // perder gordura
+                case 2: ajuste = 0; break; // manter
+                case 3: ajuste = 500; break; // ganhar massa
+                default: ajuste = 0; break;
+            }
+
+            double resultado = tdee + ajuste;
+            if (resultado < 1200) resultado = 1200; // mínimo recomendado
+            return (int) Math.round(resultado);
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao calcular calorias, usando fallback 2000", e);
+            return 2000;
+        }
     }
 }

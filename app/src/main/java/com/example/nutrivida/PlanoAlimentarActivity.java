@@ -61,10 +61,17 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
             totalCalorias += r.getCalorias();
         }
 
+        // Prefer the calculated daily calories if passed via Intent
+        int caloriasDiariasExtra = getIntent() != null ? getIntent().getIntExtra("calorias_diarias", -1) : -1;
         try {
-            caloriasTextView.setText(getString(R.string.meta_diaria).replace("3000 ml", totalCalorias + " kcal"));
+            if (caloriasDiariasExtra > 0) {
+                caloriasTextView.setText("Recomendado: " + caloriasDiariasExtra + " kcal/dia");
+            } else {
+                caloriasTextView.setText(getString(R.string.meta_diaria).replace("3000 ml", totalCalorias + " kcal"));
+            }
         } catch (Exception e){
-            caloriasTextView.setText(totalCalorias + " kcal");
+            if (caloriasDiariasExtra > 0) caloriasTextView.setText("Recomendado: " + caloriasDiariasExtra + " kcal/dia");
+            else caloriasTextView.setText(totalCalorias + " kcal");
         }
 
 
