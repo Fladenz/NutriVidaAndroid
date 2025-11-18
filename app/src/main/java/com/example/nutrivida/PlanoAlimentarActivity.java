@@ -8,17 +8,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 
 public class PlanoAlimentarActivity extends AppCompatActivity {
 
+    private static final String TAG = "PlanoAlimentarActivity";
 
     private TextView caloriasTextView;
     private RecyclerView planoAlimentarRecyclerView;
@@ -30,18 +36,32 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activityplanoalimentar_);
 
+        Log.d(TAG, "onCreate start");
+        Toast.makeText(this, "Abrindo Plano Alimentar...", Toast.LENGTH_SHORT).show();
 
         caloriasTextView = findViewById(R.id.tv_calorias_recomendadas);
         planoAlimentarRecyclerView = findViewById(R.id.rv_plano_alimentar);
         voltarButton = findViewById(R.id.btn_voltar);
 
+        List<Refeicao> planoOriginal = getPlanoAlimentarSimulado();
 
-        List<Refeicao> plano = getPlanoAlimentarSimulado();
+        String alergiasRaw = getIntent() != null ? getIntent().getStringExtra("alergias") : "";
+        Log.d(TAG, "Alergias recebidas: " + alergiasRaw);
+
+        List<String> alergias = parseAlergias(alergiasRaw);
+        Log.d(TAG, "Alergias normalizadas: " + alergias);
+
+        List<Refeicao> planoFiltrado = filterPlanoByAlergias(planoOriginal, alergias);
+
+        if (planoFiltrado.isEmpty()) {
+            Toast.makeText(this, "Nenhuma refeição compatível com suas alergias foi encontrada.", Toast.LENGTH_LONG).show();
+        }
+
         int totalCalorias = 0;
-        for (Refeicao r : plano) {
+        for (Refeicao r : planoFiltrado) {
             totalCalorias += r.getCalorias();
         }
-        // Use resource string if available, fallback to concatenation
+
         try {
             caloriasTextView.setText(getString(R.string.meta_diaria).replace("3000 ml", totalCalorias + " kcal"));
         } catch (Exception e){
@@ -49,7 +69,7 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
         }
 
 
-        PlanoAlimentarAdapter adapter = new PlanoAlimentarAdapter(plano);
+        PlanoAlimentarAdapter adapter = new PlanoAlimentarAdapter(planoFiltrado);
         planoAlimentarRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         planoAlimentarRecyclerView.setAdapter(adapter);
 
@@ -60,6 +80,45 @@ public class PlanoAlimentarActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+        Log.d(TAG, "onCreate end");
+    }
+
+    private List<String> parseAlergias(String raw) {
+        if (raw == null || raw.trim().isEmpty()) return new ArrayList<>();
+        // split por vírgula, ponto-e-vírgula ou espaço, e normalize
+        String[] parts = raw.split("[;,\\n]+|\\s+");
+        List<String> out = new ArrayList<>();
+        for (String p : parts) {
+            String n = normalize(p);
+            if (!n.isEmpty()) out.add(n);
+        }
+        return out;
+    }
+
+    private String normalize(String s) {
+        if (s == null) return "";
+        String noAccents = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        return noAccents.toLowerCase(Locale.ROOT).trim();
+    }
+
+    private List<Refeicao> filterPlanoByAlergias(List<Refeicao> plano, List<String> alergias) {
+        if (alergias == null || alergias.isEmpty()) return plano;
+        List<Refeicao> out = new ArrayList<>();
+        for (Refeicao r : plano) {
+            String nome = normalize(r.getNome());
+            String desc = normalize(r.getDescricao());
+            boolean containsAlergia = false;
+            for (String a : alergias) {
+                if (a.isEmpty()) continue;
+                if (nome.contains(a) || desc.contains(a)) {
+                    containsAlergia = true;
+                    break;
+                }
+            }
+            if (!containsAlergia) out.add(r);
+        }
+        return out;
     }
 
 

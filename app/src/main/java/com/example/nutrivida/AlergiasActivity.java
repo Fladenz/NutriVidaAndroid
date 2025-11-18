@@ -2,6 +2,7 @@ package com.example.nutrivida;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,7 +45,7 @@ public class AlergiasActivity extends AppCompatActivity {
                         Toast.makeText(AlergiasActivity.this, "Alergias salvas: " + alergiasDigitadas, Toast.LENGTH_LONG).show();
                     }
 
-                    navegarParaDashboard();
+                    navegarParaPlanoAlimentar(alergiasDigitadas);
                 }
             });
 
@@ -52,7 +53,7 @@ public class AlergiasActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(AlergiasActivity.this, "Prosseguindo sem restrições de alergia.", Toast.LENGTH_SHORT).show();
-                    navegarParaDashboard();
+                    navegarParaPlanoAlimentar("");
                 }
             });
 
@@ -73,7 +74,16 @@ public class AlergiasActivity extends AppCompatActivity {
         }
     }
 
-    private void navegarParaDashboard() {
+    private void navegarParaPlanoAlimentar(String alergias) {
+        // Inicia a activity do plano alimentar e finaliza esta
+        try {
+            Intent intent = new Intent(this, PlanoAlimentarActivity.class);
+            intent.putExtra("alergias", alergias != null ? alergias : "");
+            startActivity(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao iniciar PlanoAlimentarActivity", e);
+            Toast.makeText(this, "Erro ao abrir Plano Alimentar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
         finish();
     }
 }

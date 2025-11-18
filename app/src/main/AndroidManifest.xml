@@ -25,11 +25,11 @@
         <activity android:name=".QuestionarioActivity" />
         <activity android:name=".AlergiasActivity" />
         <activity android:name=".DashboardActivity" />
-<!--        <activity android:name=".PlanoAlimentarActivity" />-->
-<!--        <activity android:name=".ConfiguracoesActivity" />-->
-<!--        <activity android:name=".MonitoramentoActivity" />-->
-<!--        <activity android:name=".RefeicoesDiaActivity" />-->
-<!--        <activity android:name=".HidratacaoActivity" />-->
+        <activity android:name=".PlanoAlimentarActivity" />
+        <!--        <activity android:name=".ConfiguracoesActivity" />-->
+        <!--        <activity android:name=".MonitoramentoActivity" />-->
+        <!--        <activity android:name=".RefeicoesDiaActivity" />-->
+        <!--        <activity android:name=".HidratacaoActivity" />-->
     </application>
 
 </manifest>

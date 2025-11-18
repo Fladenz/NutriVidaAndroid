@@ -51,22 +51,14 @@ public class DashboardActivity extends AppCompatActivity {
 //        });
 
 
-//        monitoramentoButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(DashboardActivity.this, MonitoramentoActivity.class);
-//                startActivity(intent);
-//            }
-//        });
 
-
-//        configuracoesButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(DashboardActivity.this, ConfiguracoesActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        configuracoesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, ConfiguracoesActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
 //        // declarar e inicializar btnRefeicoesDia antes de usar
