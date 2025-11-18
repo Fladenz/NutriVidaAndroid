@@ -33,13 +33,13 @@ public class DashboardActivity extends AppCompatActivity {
         welcomeTextView.setText("Olá, " + nomeUsuario + "!");
 
 
-//        planoAlimentarButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(DashboardActivity.this, PlanoAlimentarActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        planoAlimentarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DashboardActivity.this, PlanoAlimentarActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
 //        receitasButton.setOnClickListener(new View.OnClickListener() {
